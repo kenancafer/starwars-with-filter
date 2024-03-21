@@ -1,0 +1,14 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+}
+body {
+  background-image: url(images/starwars-bg.jpg);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+.row {
+  display: flex;
+  justify-content: center;
+}
