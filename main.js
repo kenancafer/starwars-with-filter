@@ -111,7 +111,6 @@ let characters = [
     id: 20,
     name: "Yoda",
     pic: "https://vignette.wikia.nocookie.net/starwars/images/d/d6/Yoda_SWSB.png",
-    homeworld: "others",
   },
   {
     id: 21,
@@ -120,18 +119,7 @@ let characters = [
     homeworld: "naboo",
   },
 ];
-// ALL CHARACTERS HOMEWORLD SELECTED
-let homeworldsRaw = characters.map(function (characters) {
-  return characters.homeworld;
-});
-//REPEATED homeworld  DELETED
-const homeworldsUnique = [...new Set(homeworldsRaw)];
-//HOMEWORLD toLowerCase()
-let homeworldsLowercase = homeworldsUnique.map((element) => {
-  return element.toLowerCase();
-});
-
-let homeworld = homeworldsUnique;
+const row = document.querySelector(".row");
 
 function renderCharacters() {
   let firstBtn = document.getElementById("firstBtn");
@@ -143,11 +131,13 @@ function renderCharacters() {
     let card = `
           <div class="col-xxl-3 col-lg-4 col-md-6 mb-5 d-flex justify-content-center">
             <div class="card" style="width: 18rem ">
-                  <img src="${character.pic}" class="card-img-top" style="height: 25rem "/>
+                  <img src="${
+                    character.pic
+                  }" class="card-img-top" style="height: 25rem "/>
               <div class="card-body">
                 <h5 class="card-title">${character.name}</h5>
                 <p class="card-text">
-                  ${character.homeworld}
+                  ${character.homeworld || "others"}
                 </p>
               </div>
             </div>
@@ -161,7 +151,7 @@ function renderCharacters() {
   firstBtn.onclick = removeCharacters;
   row.classList.add("d-none");
 }
-//REMOVE ALL CARDS
+
 function removeCharacters() {
   mainHeader.innerHTML = "";
   firstBtn.textContent = "Show characters";
@@ -171,59 +161,57 @@ function removeCharacters() {
   row.classList.remove("d-none");
 }
 
-// Radio section created
+let homeworldsRaw = characters.map(
+  (characters) => characters.homeworld ?? "others"
+);
+
+let homeworlds = [
+  ...new Set(
+    characters.map((character) =>
+      (character.homeworld ?? "others").toLowerCase()
+    )
+  ),
+];
 const filterContainer = document.querySelector(".filter-container");
-
-for (let i = 0; i < homeworld.length; i++) {
-  filterContainer.innerHTML += `
+filterContainer.innerHTML = homeworlds
+  .map(
+    (homeworld) =>
+      `
   <div class="form-check text-white mx-2 mb-5">
-    <input class="form-check-input" type="radio"  name="homeworld" id="homeworld-${homeworld[i]}" value="${homeworld[i]}">
-    <label class="form-check-label " for="homeworld-${homeworld[i]}">${homeworld[i]}</label>
-  </div>
-  `;
-}
+     <input class="form-check-input" type="radio"  name="homeworld" id="homeworld-${homeworld}" value="${homeworld}">
+     <label class="form-check-label " for="homeworld-${homeworld}">${homeworld}</label>
+   </div>
+`
+  )
+  .join("");
 
-const filteredHomeworld = document.querySelectorAll(".form-check-input");
-let row = document.querySelector(".row");
-
-for (let i = 0; i < filteredHomeworld.length; i++) {
-  filteredHomeworld[i].addEventListener("click", function () {
-    const selectedHomeworlds = characters.filter(
-      (selectedHomeworld) =>
-        selectedHomeworld.homeworld == filteredHomeworld[i].value
-    );
-
-    if (row.innerHTML == "") {
-      for (const selected of selectedHomeworlds) {
-        row.innerHTML += `          
-           <div class="col-xxl-3 col-lg-4 col-md-6 mb-5 d-flex justify-content-center">
-            <div class="card" style="width: 18rem ">
-                  <img src="${selected.pic}" class="card-img-top" style="height: 25rem "/>
-              <div class="card-body">
-                <h5 class="card-title">${selected.name}</h5>
-                <p class="card-text">
-                  ${selected.homeworld}
-                </p>
-              </div>
-            </div>
-          </div>`;
-      }
-    } else if (row.innerHTML != "") {
-      row.innerHTML = "";
-      for (const selected of selectedHomeworlds) {
-        row.innerHTML += `
-        <div class="col-xxl-3 col-lg-4 col-md-6 mb-5 d-flex justify-content-center">
-        <div class="card" style="width: 18rem ">
-              <img src="${selected.pic}" class="card-img-top" style="height: 25rem "/>
-          <div class="card-body">
-            <h5 class="card-title">${selected.name}</h5>
-            <p class="card-text">
-              ${selected.homeworld}
-            </p>
-          </div>
-        </div>
-      </div>`;
-      }
-    }
-  });
-}
+filterContainer.addEventListener("change", function (event) {
+  if (event.target.classList.contains("form-check-input")) {
+    const selectedHomeworld = event.target.value;
+    const selecetedCharacter = characters.filter((character) => {
+      const homeworld = character.homeworld
+        ? character.homeworld.toLowerCase()
+        : "others";
+      return homeworld === selectedHomeworld;
+    });
+    row.innerHTML = selecetedCharacter
+      .map((character) => {
+        return `
+      <div class="col-xxl-3 col-lg-4 col-md-6 mb-5 d-flex justify-content-center">
+                   <div class="card" style="width: 18rem ">
+                         <img src="${
+                           character.pic
+                         }" class="card-img-top" style="height: 25rem "/>
+                     <div class="card-body">
+                       <h5 class="card-title">${character.name}</h5>
+                       <p class="card-text">
+                         ${character.homeworld || "others"}
+                       </p>
+                     </div>
+                   </div>
+                 </div>
+      `;
+      })
+      .join("");
+  }
+});
